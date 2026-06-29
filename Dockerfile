@@ -55,6 +55,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxrandr2 \
     libgl1 \
     xdg-utils \
+    x11-utils \
     python3 \
     python3-pip \
     supervisor \
@@ -115,7 +116,8 @@ stdout_logfile=/var/log/supervisor/xfce.log
 stderr_logfile=/var/log/supervisor/xfce.err.log
 
 [program:x11vnc]
-command=/usr/bin/x11vnc -display :99 -rfbport 5900 -shared -forever -bg -o /var/log/supervisor/x11vnc.log
+# Wait for Xvfb to be ready, then start x11vnc
+command=/bin/bash -c "for i in $(seq 1 30); do xdpyinfo -display :99 >/dev/null 2>&1 && break || sleep 1; done; /usr/bin/x11vnc -display :99 -rfbport 5900 -shared -forever -o /var/log/supervisor/x11vnc.log"
 user=root
 autostart=true
 autorestart=true
