@@ -329,16 +329,26 @@ docker run -d \
 http://<服务器IP>:6080
 ```
 
-VNC 密码默认：`***`（可通过 `VNC_PASSWORD` 环境变量修改）
+VNC 密码默认：`***`（可通过 `VNC_PASSWORD` 环境变量修改，例如 `-e VNC_PASSWORD=***
 
 **Docker Hub 地址：** https://hub.docker.com/r/hassis/cube-shell
 
 **Dockerfile 功能：**
-- 基于 Ubuntu 22.04
+- 基于 Ubuntu 24.04
 - 内含 XFCE 桌面 + x11vnc + noVNC
 - 内含 Firefox ESR 浏览器
 - 使用 Supervisor 管理所有服务（自动重启）
-- VNC 密码可通过环境变量配置
+- VNC 密码可通过 `-e VNC_PASSWORD=yourpass` 运行时修改
+
+**使用自定义密码启动示例：**
+```bash
+docker run -d \
+  --name cube-shell \
+  --restart=always \
+  -p 6080:6080 \
+  -e VNC_PASSWORD=*** \
+  hassis/cube-shell:latest
+```
 
 #### 参与贡献
 欢迎各位朋友积极参与代码贡献。
