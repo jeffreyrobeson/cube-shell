@@ -217,6 +217,87 @@ chmod +x build-linux.sh
 | `deploy/cube-shell-linux-x86_64.tar.gz` | 压缩发布包，可分发至其他机器解压使用 |
 | `deploy/cube-shell.dist/cube-shell.desktop` | 桌面快捷方式文件，复制到 `~/.local/share/applications/` 后可在应用菜单中找到 |
 
+##### Web 远程桌面部署（Linux 服务器无显示器场景）
+
+若需要在没有显示器的 Linux 服务器上运行 cube-shell 并通过浏览器远程访问，可按以下步骤部署。
+
+1. 安装桌面环境与远程访问组件
+
+```bash
+# 安装 XFCE 桌面环境
+sudo apt-get install -y xfce4 xfce4-terminal
+
+# 安装 VNC 服务器
+sudo apt-get install -y x11vnc
+mkdir -p ~/.vnc
+x11vnc -storepasswd <你的密码> ~/.vnc/passwd
+
+# 安装 noVNC（Web VNC 客户端）
+sudo apt-get install -y novnc websockify
+
+# 安装 Firefox 浏览器（可选，用于远程浏览网页）
+sudo apt-get install -y firefox-esr
+```
+
+2. 启动虚拟显示与桌面环境
+
+```bash
+# 启动 Xvfb 虚拟显示器
+export DISPLAY=:99
+Xvfb :99 -screen 0 1920x1080x24 &
+
+# 启动 XFCE 桌面
+startxfce4 &
+```
+
+3. 启动 VNC 服务
+
+```bash
+x11vnc -display :99 -rfbport 5900 -rfbauth ~/.vnc/passwd -shared -forever -bg
+```
+
+4. 启动 noVNC Web 代理
+
+```bash
+websockify --web /usr/share/novnc 6080 localhost:5900 &
+```
+
+现在可以通过浏览器访问 `http://<服务器IP>:6080/vnc.html` 看到桌面。
+
+5. 启动 cube-shell
+
+```bash
+cd cube-shell
+export DISPLAY=:99
+source venv/bin/activate
+python cube-shell.py
+```
+
+6. （可选）Nginx 反向代理配置
+
+若需通过域名 + HTTPS 访问，配置 Nginx 反向代理：
+
+```nginx
+server {
+    listen 443 ssl;
+    server_name <你的域名>;
+
+    ssl_certificate /path/to/fullchain.pem;
+    ssl_certificate_key /path/to/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:6080/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_read_timeout 86400;
+    }
+}
+```
+
 #### 参与贡献
 欢迎各位朋友积极参与代码贡献。
 

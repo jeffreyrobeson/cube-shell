@@ -98,8 +98,8 @@ nuitka \
   --enable-plugin=pyside6 \
   --follow-imports \
   --remove-output \
-  --jobs=4 \
-  --lto=yes \
+  --jobs=1 \
+  --lto=no \
   --output-dir="${DEPLOY_DIR}" \
   --linux-icon=icons/logo.ico \
   --include-module=qdarktheme \
@@ -110,7 +110,6 @@ nuitka \
   --include-module=openai \
   --include-module=keyring \
   --include-module=prompt_toolkit \
-  --include-package=unicrypto \
   --include-module=pygments.formatters.html \
   --include-module=pygments.lexers.shell \
   --include-package=qtermwidget,core,function,style,ui,icons \
