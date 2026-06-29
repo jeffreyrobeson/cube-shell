@@ -4,23 +4,16 @@
 # Build:
 #   docker build -t hassis/cube-shell:latest .
 #
-# Run (默认密码):
+# Run:
 #   docker run -d \
 #     --name cube-shell \
 #     --restart=always \
 #     -p 6080:6080 \
-#     hassis/cube-shell:latest
-#
-# Run (自定义密码):
-#   docker run -d \
-#     --name cube-shell \
-#     --restart=always \
-#     -p 6080:6080 \
-#     -e VNC_PASSWORD=*** \
 #     hassis/cube-shell:latest
 #
 # Access:
 #   http://<host>:6080  (noVNC web interface)
+#   注意：无 VNC 密码，仅限内网使用
 # ============================================================================
 
 FROM ubuntu:24.04
@@ -28,8 +21,6 @@ FROM ubuntu:24.04
 LABEL maintainer="hassis"
 LABEL description="cube-shell Linux remote desktop with Web browser access (noVNC)"
 
-# Runtime VNC password (默认 CubeShell123，可通过 -e VNC_PASSWORD=xxx 覆盖)
-ENV VNC_PASSWORD=CubeShell123
 ARG DEBIAN_FRONTEND=noninteractive
 
 # ---------------------------------------------------------------------------
@@ -95,13 +86,10 @@ RUN chown -R cubeuser:cubeuser /home/cubeuser/cube-shell/ && \
     chmod +x /home/cubeuser/cube-shell/cube-shell.sh 2>/dev/null || true
 
 # ---------------------------------------------------------------------------
-# 4. Prepare VNC dirs (password file generated at runtime)
+# 4. Supervisord config
 # ---------------------------------------------------------------------------
-RUN mkdir -p /home/cubeuser/.vnc /var/log/supervisor
+RUN mkdir -p /var/log/supervisor
 
-# ---------------------------------------------------------------------------
-# 5. Supervisord config
-# ---------------------------------------------------------------------------
 COPY <<EOF /etc/supervisor/conf.d/cube-shell.conf
 [supervisord]
 nodaemon=true
@@ -127,7 +115,7 @@ stdout_logfile=/var/log/supervisor/xfce.log
 stderr_logfile=/var/log/supervisor/xfce.err.log
 
 [program:x11vnc]
-command=/usr/bin/x11vnc -display :99 -rfbport 5900 -rfbauth /home/cubeuser/.vnc/passwd -shared -forever -bg -o /var/log/supervisor/x11vnc.log
+command=/usr/bin/x11vnc -display :99 -rfbport 5900 -shared -forever -bg -o /var/log/supervisor/x11vnc.log
 user=root
 autostart=true
 autorestart=true
@@ -144,21 +132,11 @@ stderr_logfile=/var/log/supervisor/websockify.err.log
 EOF
 
 # ---------------------------------------------------------------------------
-# 6. Entrypoint (运行时生成 VNC 密码文件)
+# 5. Entrypoint
 # ---------------------------------------------------------------------------
 COPY <<EOF /entrypoint.sh
 #!/bin/bash
 set -e
-
-# 运行时生成 VNC 密码文件（支持 docker run -e VNC_PASSWORD=xxx）
-# 运行时生成 VNC 密码文件（支持 docker run -e VNC_PASSWORD=*** 传参）
-mkdir -p /home/cubeuser/.vnc
-printf '%s\n' "${VNC_PASSWORD}" "${VNC_PASSWORD}" | x11vnc -storepasswd
-mv /home/cubeuser/.vnc/passwd /home/cubeuser/.vnc/passwd.bak 2>/dev/null || true
-x11vnc -storepasswd "${VNC_PASSWORD}" /home/cubeuser/.vnc/passwd
-chown -R cubeuser:cubeuser /home/cubeuser/.vnc/
-chmod 600 /home/cubeuser/.vnc/passwd
-
 exec supervisord -c /etc/supervisor/conf.d/cube-shell.conf
 EOF
 
