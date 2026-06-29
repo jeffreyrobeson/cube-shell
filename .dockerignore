@@ -1,0 +1,9 @@
+venv/
+deploy/
+.git/
+*.egg-info/
+__pycache__/
+*.pyc
+.dockerignore
+Dockerfile
+*.log
