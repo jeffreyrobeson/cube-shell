@@ -109,7 +109,7 @@ stdout_logfile=/var/log/supervisor/xvfb.log
 stderr_logfile=/var/log/supervisor/xvfb.err.log
 
 [program:xfce]
-command=/usr/bin/dbus-run-session -- /usr/bin/startxfce4
+command=/bin/bash -c "for i in \$(seq 1 30); do xdpyinfo -display :99 >/dev/null 2>&1 && break || sleep 1; done; export DISPLAY=:99 && dbus-run-session -- /usr/bin/startxfce4"
 user=root
 autostart=true
 autorestart=true
