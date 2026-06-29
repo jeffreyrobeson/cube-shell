@@ -52,7 +52,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgtk-3-0 \
     libnspr4 \
     libxcomposite1 \
-    libxdamage1 \
     libxfixes3 \
     libxrandr2 \
     xdg-utils \
@@ -63,7 +62,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # ---------------------------------------------------------------------------
-# 1b. Install Firefox ESR via Mozilla PPA
+# 1b. Install Firefox ESR via Mozilla PPA (Ubuntu 22.04 default has no firefox-esr)
 # ---------------------------------------------------------------------------
 RUN curl -fsSL https://packages.mozilla.org/apt/repo-signing-key.gpg | \
     gpg --dearmor -o /usr/share/keyrings/packages.mozilla.org-archive.gpg && \
