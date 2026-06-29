@@ -56,9 +56,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1 \
     xdg-utils \
     x11-utils \
+    supervisor \
+    dbus-x11 \
     python3 \
     python3-pip \
-    supervisor \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -108,7 +109,7 @@ stdout_logfile=/var/log/supervisor/xvfb.log
 stderr_logfile=/var/log/supervisor/xvfb.err.log
 
 [program:xfce]
-command=/usr/bin/startxfce4
+command=/usr/bin/dbus-run-session -- /usr/bin/startxfce4
 user=root
 autostart=true
 autorestart=true
