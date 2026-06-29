@@ -329,7 +329,7 @@ docker run -d \
 http://<服务器IP>:6080
 ```
 
-VNC 密码默认：`***`（可通过 `VNC_PASSWORD` 环境变量修改，例如 `-e VNC_PASSWORD=***
+- VNC 密码：**无密码**（直接连接，建议配合 Nginx 认证或仅内网使用）
 
 **Docker Hub 地址：** https://hub.docker.com/r/hassis/cube-shell
 
