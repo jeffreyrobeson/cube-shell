@@ -61,6 +61,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     x11-utils \
     supervisor \
     bzip2 \
+    xz-utils \
     dbus-x11 \
     python3-full \
     python3-venv \
@@ -88,17 +89,23 @@ RUN wget -q https://launchpadlibrarian.net/401200993/libxcb-icccm4_0.4.1-1.1_amd
 # ------------------------------------------------------------------
 # 1b. Install Firefox ESR via Mozilla archive
 # ------------------------------------------------------------------
-RUN curl -sL https://ftp.mozilla.org/pub/firefox/releases/128.0esr/linux-x86_64/en-US/firefox-128.0esr.tar.bz2 -o /tmp/firefox.tar.bz2 && \
-    tar -xjf /tmp/firefox.tar.bz2 -C /opt && \
+RUN curl -sL https://ftp.mozilla.org/pub/firefox/releases/152.0.3/linux-x86_64/en-US/firefox-152.0.3.tar.xz -o /tmp/firefox.tar.xz&& \
+    tar -xJf /tmp/firefox.tar.xz -C /opt && \
     mv /opt/firefox /opt/firefox-esr && \
     ln -sf /opt/firefox-esr/firefox /usr/local/bin/firefox && \
-    rm -f /tmp/firefox.tar.bz2
+    rm -f /tmp/firefox.tar.xz && \
+    mkdir -p /usr/share/applications && \
+    echo '[Desktop Entry]\nVersion=1.0\nName=Firefox ESR\nComment=Web Browser\nExec=/opt/firefox-esr/firefox %u\nIcon=/opt/firefox-esr/browser/chrome/icons/default/default128.png\nTerminal=false\nType=Application\nCategories=Network;WebBrowser;\nMimeType=text/html;application/xhtml+xml;' > /usr/share/applications/firefox-esr.desktop
 
 # ------------------------------------------------------------------
 # 2. Create non-root user
 # ------------------------------------------------------------------
 RUN useradd -m -s /bin/bash cubeuser && \
-    echo "cubeuser:cube123" | chpasswd
+    echo "cubeuser:cube123" | chpasswd && \
+    mkdir -p /home/cubeuser/.config/xfce4 && \
+    echo 'WebBrowser=firefox-esr' > /home/cubeuser/.config/xfce4/helpers.rc && \
+    chown -R cubeuser:cubeuser /home/cubeuser/.config
+
 
 # ------------------------------------------------------------------
 # 3. Create venv and install Python dependencies
