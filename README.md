@@ -350,6 +350,27 @@ docker run -d \
   hassis/cube-shell:latest
 ```
 
+**IPv6 支持（如需连接 IPv6 only 的服务器）：**
+
+Docker 默认不启用 IPv6，需先在宿主机配置：
+
+```bash
+# 在宿主机上运行（只需一次）
+curl -sL https://raw.githubusercontent.com/jeffreyrobeson/cube-shell/master/scripts/setup-ipv6.sh | bash
+
+# 然后正常启动容器即可
+docker run -d --name cube-shell -p 6080:6080 hassis/cube-shell:latest
+```
+
+如果目标服务器无法访问 IPv6（如没有公网 IPv6 路由），容器内 SSH 连接 IPv6 only 服务器会失败（`Network is unreachable`）。此时可使用 socat 做 IPv6→IPv4 代理：
+
+```bash
+# 在有 IPv6 的宿主机上运行
+socat TCP-LISTEN:2222,fork,reuseaddr TCP6:[<IPv6地址>]:22 &
+
+# 容器内 SSH 连接时使用 127.0.0.1:2222
+```
+
 #### 参与贡献
 欢迎各位朋友积极参与代码贡献。
 
