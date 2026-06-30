@@ -183,7 +183,7 @@ stdout_logfile=/var/log/supervisor/xfce.log
 stderr_logfile=/var/log/supervisor/xfce.err.log
 
 [program:x11vnc]
-command=/usr/bin/x11vnc -rfbauth /root/.vnc/passwd
+command=/usr/bin/x11vnc -display :99 -rfbport 5900 -shared -forever -rfbauth /root/.vnc/passwd -o /var/log/supervisor/x11vnc.log
 user=root
 autostart=true
 autorestart=true
