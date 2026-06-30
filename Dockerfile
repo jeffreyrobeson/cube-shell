@@ -60,6 +60,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     xdg-utils \
     x11-utils \
     supervisor \
+    bzip2 \
     dbus-x11 \
     python3-full \
     python3-venv \
@@ -85,9 +86,13 @@ RUN wget -q https://launchpadlibrarian.net/401200993/libxcb-icccm4_0.4.1-1.1_amd
     rm -f /tmp/icccm.deb /tmp/keysyms.deb
 
 # ------------------------------------------------------------------
-# 1b. Lightweight browser (optional - use xfce4-terminal for now)
-# Firefox removed due to install issues; can be added via Docker compose if needed
+# 1b. Install Firefox ESR via Mozilla archive
 # ------------------------------------------------------------------
+RUN curl -sL https://ftp.mozilla.org/pub/firefox/releases/128.0esr/linux-x86_64/en-US/firefox-128.0esr.tar.bz2 -o /tmp/firefox.tar.bz2 && \
+    tar -xjf /tmp/firefox.tar.bz2 -C /opt && \
+    mv /opt/firefox /opt/firefox-esr && \
+    ln -sf /opt/firefox-esr/firefox /usr/local/bin/firefox && \
+    rm -f /tmp/firefox.tar.bz2
 
 # ------------------------------------------------------------------
 # 2. Create non-root user
