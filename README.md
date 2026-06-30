@@ -329,7 +329,7 @@ docker run -d \
 http://<服务器IP>:6080
 ```
 
-- VNC 密码：**无密码**（直接连接，建议配合 Nginx 认证或仅内网使用）
+- VNC 密码：**无密码**（使用前需要在容器里设密码）
 
 **Docker Hub 地址：** https://hub.docker.com/r/hassis/cube-shell
 
@@ -338,7 +338,7 @@ http://<服务器IP>:6080
 - 内含 XFCE 桌面 + x11vnc + noVNC
 - 内含 Firefox ESR 浏览器
 - 使用 Supervisor 管理所有服务（自动重启）
-- VNC 密码可通过 `-e VNC_PASSWORD=yourpass` 运行时修改
+- VNC 密码可通过 `x11vnc -storepasswd` 在容器里设密码
 
 **使用自定义密码启动示例：**
 ```bash
