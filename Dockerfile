@@ -95,7 +95,7 @@ RUN curl -sL https://ftp.mozilla.org/pub/firefox/releases/152.0.3/linux-x86_64/e
     ln -sf /opt/firefox-esr/firefox /usr/local/bin/firefox && \
     rm -f /tmp/firefox.tar.xz && \
     mkdir -p /usr/share/applications && \
-    echo '[Desktop Entry]\nVersion=1.0\nName=Firefox ESR\nComment=Web Browser\nExec=/opt/firefox-esr/firefox %u\nIcon=/opt/firefox-esr/browser/chrome/icons/default/default128.png\nTerminal=false\nType=Application\nCategories=Network;WebBrowser;\nMimeType=text/html;application/xhtml+xml;' > /usr/share/applications/firefox-esr.desktop
+    echo '[Desktop Entry]\nVersion=1.0\nName=Firefox\nComment=Web Browser\nExec=env LIBGL_ALWAYS_INDIRECT=1 MOZ_WEBRENDER=0 /opt/firefox-esr/firefox %u\nIcon=/opt/firefox-esr/browser/chrome/icons/default/default128.png\nTerminal=false\nType=Application\nCategories=Network;WebBrowser;\nMimeType=text/html;application/xhtml+xml;text/plain;' > /usr/share/applications/firefox-esr.desktop
 
 # ------------------------------------------------------------------
 # 2. Create non-root user
@@ -183,7 +183,7 @@ stdout_logfile=/var/log/supervisor/xfce.log
 stderr_logfile=/var/log/supervisor/xfce.err.log
 
 [program:x11vnc]
-command=/bin/bash -c "for i in \$(seq 1 30); do xdpyinfo -display :99 >/dev/null 2>&1 && break || sleep 1; done; /usr/bin/x11vnc -display :99 -rfbport 5900 -shared -forever -o /var/log/supervisor/x11vnc.log"
+command=/usr/bin/x11vnc -rfbauth /root/.vnc/passwd
 user=root
 autostart=true
 autorestart=true
